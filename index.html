@@ -3,36 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Students list - Management System</title>
+    <title>student list - Management System</title>
     <style>
         :root { --primary: #2c3e50; --secondary: #34495e; --accent: #27ae60; --text: #2c3e50; --danger: #e74c3c; --info: #3498db; --warning: #f39c12; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; color: var(--text); }
         .container { max-width: 1300px; margin: auto; }
         .header { background: var(--primary); color: white; padding: 15px; text-align: center; border-radius: 8px; margin-bottom: 20px; }
+        
+        /* Dashboard */
         .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
         .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-left: 5px solid var(--accent); }
         .card h3 { margin: 0; color: #7f8c8d; font-size: 13px; text-transform: uppercase; }
         .card p { font-size: 22px; font-weight: bold; margin: 10px 0 0; color: var(--primary); }
+
+        /* Controls */
         .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 10px; flex-wrap: wrap; }
         .filter-group { display: flex; gap: 10px; flex-grow: 1; align-items: center; }
         .search-box { flex-grow: 2; padding: 12px 20px; border: 2px solid var(--primary); border-radius: 25px; outline: none; font-size: 15px; }
         .course-filter { flex-grow: 1; padding: 11px; border: 2px solid var(--primary); border-radius: 25px; outline: none; cursor: pointer; }
+        
         .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
         .tab-btn { background: #ddd; color: #333; padding: 10px 18px; cursor: pointer; border-radius: 5px; border: none; font-weight: 600; }
         .tab-btn.active { background: var(--primary); color: white; }
+        
         .section { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 30px; }
         .grid-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
-        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 5px; width: 100%; box-sizing: border-box; transition: 0.3s; }
+        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 5px; width: 100%; box-sizing: border-box; }
         .invalid-field { border: 2px solid var(--danger) !important; background-color: #fff6f6; }
+        
         button { padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; border: none; }
         .btn-submit { background: var(--accent); color: white; }
         .btn-excel { background: #1d6f42; color: white; }
         .btn-print { background: var(--secondary); color: white; }
+
         .table-container { background: white; border-radius: 8px; overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         table { width: 100%; border-collapse: collapse; min-width: 1000px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
         th { background: var(--secondary); color: white; }
         .clickable { color: var(--info); cursor: pointer; font-weight: bold; text-decoration: underline; }
+
+        /* Modal */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); }
         .modal-content { background: white; margin: 5% auto; padding: 25px; border-radius: 12px; width: 85%; max-width: 800px; position: relative; max-height: 85vh; overflow-y: auto; }
         .close-modal { position: absolute; right: 20px; top: 15px; font-size: 24px; cursor: pointer; }
@@ -48,7 +58,7 @@
 <body>
 
 <div class="container">
-    <div class="header"><h1>students list - Management System</h1></div>
+    <div class="header"><h1>Student list - Management System</h1></div>
 
     <div class="dashboard">
         <div class="card"><h3>Total Students</h3><p id="totalStudents">0</p></div>
@@ -143,12 +153,13 @@
 </div>
 
 <script>
-    // আপনার নতুন গুগল অ্যাপস স্ক্রিপ্ট লিঙ্ক এখানে বসান
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyFO_I7EdtOxwo3bnXbo1uHR3nY-gVkX14M-NrLyFQ6WLSk4zJQMhWr0-pK9Lz-acy9/exec"; 
+    // ১. আপনার নতুন গুগল অ্যাপস স্ক্রিপ্ট লিঙ্ক এখানে বসান
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwecAeAYriiK7O3EhU7dwN4pZptWDapnH6wyEba4cXQYlRqZpBJT24E_a48KyX3v_Ws/exec"; 
 
     let students = JSON.parse(localStorage.getItem('LIT_ST_FINAL_X')) || [];
     let courses = JSON.parse(localStorage.getItem('LIT_CR_FINAL_X')) || [{name: "Web Design", fee: 5000}];
 
+    // গুগল শিট থেকে ডাটা আনা
     async function fetchFromSheet() {
         try {
             const res = await fetch(SCRIPT_URL);
@@ -157,9 +168,10 @@
                 students = data;
                 refresh();
             }
-        } catch (e) { console.log("Load Error", e); }
+        } catch (e) { console.log("Data Load Error", e); }
     }
 
+    // গুগল শিটে ডাটা পাঠানো
     async function postToSheet(studentData) {
         try {
             await fetch(SCRIPT_URL, {
@@ -238,7 +250,7 @@
             s.course = document.getElementById('courseSelect').value;
             s.total = parseInt(document.getElementById('totalFee').value);
             s.referrer = document.getElementById('referrer').value;
-            postToSheet(s); // এডিট ডাটা সিঙ্ক
+            postToSheet(s);
         }
         refresh(); clearForm();
     }
@@ -251,7 +263,7 @@
         document.getElementById('totalCollection').innerText = "৳ " + paid;
         document.getElementById('totalDue').innerText = "৳ " + (total - paid);
         let bonus = 0;
-        students.forEach(s => { if(s.referrer !== "None" && s.paid >= (s.total * 0.5)) bonus += 500; });
+        students.forEach(s => { if(s.referrer && s.referrer !== "None" && s.paid >= (s.total * 0.5)) bonus += 500; });
         document.getElementById('totalReferral').innerText = "৳ " + bonus;
         renderList(students); renderRefs();
     }
@@ -270,8 +282,8 @@
                 <td style="color:green;font-weight:bold">${s.paid}</td>
                 <td style="color:${due > 0 ? 'red' : 'green'}"><b>${due}</b></td>
                 <td class="action-col">
-                    <button class="btn-edit" onclick="editStudent('${s.id}')">Edit</button>
-                    ${due > 0 ? `<button class="btn-submit" onclick="addPay('${s.id}')">Pay</button>` : '<span>Paid</span>'}
+                    <button class="btn-submit" style="padding:5px 10px; background:var(--info)" onclick="editStudent('${s.id}')">Edit</button>
+                    ${due > 0 ? `<button class="btn-submit" style="padding:5px 10px" onclick="addPay('${s.id}')">Pay</button>` : '<span>Paid</span>'}
                 </td>
             </tr>`;
         });
@@ -291,20 +303,18 @@
     function addPay(id) {
         const s = students.find(x => x.id === id);
         const due = s.total - s.paid;
-        const amt = prompt(`Current Due: ৳${due}\nEnter Installment Amount:`);
+        const amt = prompt(`Current Due: ৳${due}\nEnter Amount:`);
         if(!amt || isNaN(amt) || parseInt(amt) <= 0 || parseInt(amt) > due) return alert("Invalid Amount!");
-
-        const rec = prompt("New Receipt Number:");
-        if(!rec || students.some(x => x.history.some(h => h.receipt === rec))) return alert("Duplicate or Empty Receipt!");
-
-        const collector = prompt("Money Received By (Name):", s.receiver);
-        const book = prompt("Book Number:", s.lastBook);
+        const rec = prompt("Receipt Number:");
+        if(!rec) return alert("Receipt required!");
+        const collector = prompt("Received By:", s.receiver);
+        const book = prompt("Book No:", s.lastBook);
         
         const p = parseInt(amt);
         s.paid += p; s.lastRec = rec; s.lastBook = book; s.receiver = collector;
         s.history.push({amt: p, date: new Date().toLocaleString(), book: book, receipt: rec, by: collector});
         
-        postToSheet(s); // পেমেন্ট হিস্ট্রি সহ আপডেট পাঠানো
+        postToSheet(s);
         refresh();
     }
 
@@ -333,9 +343,10 @@
     function openLedger(id) {
         const s = students.find(x => x.id === id);
         document.getElementById('ledgerContent').innerHTML = `<h3>Ledger: ${s.name}</h3>
-            <table><thead><tr><th>Date</th><th>Book/Receipt</th><th>Amount</th><th>Received By</th></tr></thead>
-            <tbody>${s.history.map(h => `<tr><td>${h.date}</td><td>B:${h.book}/R:${h.receipt}</td><td>৳${h.amt}</td><td>${h.by}</td></tr>`).join('')}</tbody>
-            </table><br><b>Total Paid: ৳${s.paid} | Balance Due: ৳${s.total - s.paid}</b>`;
+            <table border="1" style="width:100%; border-collapse:collapse;">
+                <thead style="background:#eee"><tr><th>Date</th><th>Book/Receipt</th><th>Amount</th><th>By</th></tr></thead>
+                <tbody>${s.history.map(h => `<tr><td>${h.date}</td><td>B:${h.book}/R:${h.receipt}</td><td>৳${h.amt}</td><td>${h.by}</td></tr>`).join('')}</tbody>
+            </table><br><b>Total Paid: ৳${s.paid} | Due: ৳${s.total - s.paid}</b>`;
         document.getElementById('ledgerModal').style.display = 'block';
     }
 
@@ -361,6 +372,7 @@
 
     function closeModal() { document.getElementById('ledgerModal').style.display = 'none'; }
 
+    // রান করা শুরু
     renderCourses(); refresh(); fetchFromSheet();
 </script>
 
