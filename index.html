@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>students list- Management System</title>
+    <title>Students list - Management System</title>
     <style>
         :root { --primary: #2c3e50; --secondary: #34495e; --accent: #27ae60; --text: #2c3e50; --danger: #e74c3c; --info: #3498db; --warning: #f39c12; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; color: var(--text); }
@@ -48,7 +48,7 @@
 <body>
 
 <div class="container">
-    <div class="header"><h1>Student list - Management System</h1></div>
+    <div class="header"><h1>students list - Management System</h1></div>
 
     <div class="dashboard">
         <div class="card"><h3>Total Students</h3><p id="totalStudents">0</p></div>
@@ -143,13 +143,12 @@
 </div>
 
 <script>
-    // --- ১. আপনার গুগল অ্যাপস স্ক্রিপ্ট লিঙ্ক এখানে বসান ---
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxCBvRACiQusaCcSZCaotWvvl9G1GR2OhLZ1q0GKzG6Ze1wbuFaFKsn-d4E7_ULvO6V/exec"; 
+    // আপনার নতুন গুগল অ্যাপস স্ক্রিপ্ট লিঙ্ক এখানে বসান
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyFO_I7EdtOxwo3bnXbo1uHR3nY-gVkX14M-NrLyFQ6WLSk4zJQMhWr0-pK9Lz-acy9/exec"; 
 
     let students = JSON.parse(localStorage.getItem('LIT_ST_FINAL_X')) || [];
     let courses = JSON.parse(localStorage.getItem('LIT_CR_FINAL_X')) || [{name: "Web Design", fee: 5000}];
 
-    // গুগল শিট থেকে ডেটা লোড করার ফাংশন
     async function fetchFromSheet() {
         try {
             const res = await fetch(SCRIPT_URL);
@@ -158,10 +157,9 @@
                 students = data;
                 refresh();
             }
-        } catch (e) { console.log("Sheet empty or error", e); }
+        } catch (e) { console.log("Load Error", e); }
     }
 
-    // গুগল শিটে ডেটা পাঠানোর ফাংশন
     async function postToSheet(studentData) {
         try {
             await fetch(SCRIPT_URL, {
@@ -170,7 +168,7 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(studentData)
             });
-        } catch (e) { console.error("Sync failed", e); }
+        } catch (e) { console.error("Sync Error", e); }
     }
 
     function switchTab(e, id) {
@@ -232,7 +230,7 @@
                 timestamp: Date.now()
             };
             students.push(newStudent);
-            postToSheet(newStudent); // শিটে পাঠানো হচ্ছে
+            postToSheet(newStudent);
         } else {
             const s = students.find(x => x.id === eid);
             s.name = document.getElementById('stdName').value;
@@ -240,6 +238,7 @@
             s.course = document.getElementById('courseSelect').value;
             s.total = parseInt(document.getElementById('totalFee').value);
             s.referrer = document.getElementById('referrer').value;
+            postToSheet(s); // এডিট ডাটা সিঙ্ক
         }
         refresh(); clearForm();
     }
@@ -271,8 +270,8 @@
                 <td style="color:green;font-weight:bold">${s.paid}</td>
                 <td style="color:${due > 0 ? 'red' : 'green'}"><b>${due}</b></td>
                 <td class="action-col">
-                    <button class="btn-edit" style="padding:5px 10px" onclick="editStudent('${s.id}')">Edit</button>
-                    ${due > 0 ? `<button class="btn-submit" style="padding:5px 10px" onclick="addPay('${s.id}')">Pay</button>` : '<span>Paid</span>'}
+                    <button class="btn-edit" onclick="editStudent('${s.id}')">Edit</button>
+                    ${due > 0 ? `<button class="btn-submit" onclick="addPay('${s.id}')">Pay</button>` : '<span>Paid</span>'}
                 </td>
             </tr>`;
         });
@@ -286,7 +285,6 @@
             const matchesCourse = course === "" || s.course === course;
             return matchesSearch && matchesCourse;
         });
-        if(query.length > 0 || course !== "") switchTab(null, 'studentList');
         renderList(filtered);
     }
 
@@ -294,15 +292,19 @@
         const s = students.find(x => x.id === id);
         const due = s.total - s.paid;
         const amt = prompt(`Current Due: ৳${due}\nEnter Installment Amount:`);
-        if(!amt || isNaN(amt) || parseInt(amt) <= 0) return;
-        if(parseInt(amt) > due) return alert("Exceeds balance!");
+        if(!amt || isNaN(amt) || parseInt(amt) <= 0 || parseInt(amt) > due) return alert("Invalid Amount!");
+
         const rec = prompt("New Receipt Number:");
-        if(students.some(x => x.history.some(h => h.receipt === rec))) return alert("Duplicate Receipt!");
+        if(!rec || students.some(x => x.history.some(h => h.receipt === rec))) return alert("Duplicate or Empty Receipt!");
+
         const collector = prompt("Money Received By (Name):", s.receiver);
         const book = prompt("Book Number:", s.lastBook);
+        
         const p = parseInt(amt);
         s.paid += p; s.lastRec = rec; s.lastBook = book; s.receiver = collector;
         s.history.push({amt: p, date: new Date().toLocaleString(), book: book, receipt: rec, by: collector});
+        
+        postToSheet(s); // পেমেন্ট হিস্ট্রি সহ আপডেট পাঠানো
         refresh();
     }
 
@@ -322,7 +324,7 @@
 
     function clearForm() {
         document.getElementById('editId').value = "";
-        document.querySelectorAll('#admissionForm input, #admissionForm select').forEach(i => { i.value = ""; i.classList.remove('invalid-field'); });
+        document.querySelectorAll('#admissionForm input, #admissionForm select').forEach(i => i.value = "");
         document.getElementById('formTitle').innerText = "Student Admission";
         document.getElementById('saveBtn').innerText = "Confirm Admission";
         document.getElementById('cancelEdit').style.display = "none";
@@ -359,10 +361,7 @@
 
     function closeModal() { document.getElementById('ledgerModal').style.display = 'none'; }
 
-    // Start
-    renderCourses();
-    refresh();
-    fetchFromSheet(); // অটোমেটিক শিট থেকে ডেটা নিয়ে আসবে
+    renderCourses(); refresh(); fetchFromSheet();
 </script>
 
 </body>
