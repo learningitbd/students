@@ -1,1 +1,365 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning IT BD - Advanced Management System</title>
+    <style>
+        :root { --primary: #2c3e50; --secondary: #34495e; --accent: #27ae60; --text: #2c3e50; --danger: #e74c3c; --info: #3498db; --warning: #f39c12; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; color: var(--text); }
+        .container { max-width: 1300px; margin: auto; }
+        .header { background: var(--primary); color: white; padding: 15px; text-align: center; border-radius: 8px; margin-bottom: 20px; }
+        
+        /* Dashboard */
+        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-left: 5px solid var(--accent); }
+        .card h3 { margin: 0; color: #7f8c8d; font-size: 13px; text-transform: uppercase; }
+        .card p { font-size: 22px; font-weight: bold; margin: 10px 0 0; color: var(--primary); }
+
+        /* Controls & Filter */
+        .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 10px; flex-wrap: wrap; }
+        .filter-group { display: flex; gap: 10px; flex-grow: 1; align-items: center; }
+        .search-box { flex-grow: 2; padding: 12px 20px; border: 2px solid var(--primary); border-radius: 25px; outline: none; font-size: 15px; }
+        .course-filter { flex-grow: 1; padding: 11px; border: 2px solid var(--primary); border-radius: 25px; outline: none; cursor: pointer; }
+        
+        /* Tabs */
+        .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+        .tab-btn { background: #ddd; color: #333; padding: 10px 18px; cursor: pointer; border-radius: 5px; border: none; font-weight: 600; }
+        .tab-btn.active { background: var(--primary); color: white; }
+        
+        /* Form & Validation */
+        .section { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        .grid-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 5px; width: 100%; box-sizing: border-box; transition: 0.3s; }
+        .invalid-field { border: 2px solid var(--danger) !important; background-color: #fff6f6; }
+        
+        button { padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; border: none; }
+        .btn-submit { background: var(--accent); color: white; }
+        .btn-excel { background: #1d6f42; color: white; }
+        .btn-print { background: var(--secondary); color: white; }
+
+        /* Table */
+        .table-container { background: white; border-radius: 8px; overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: var(--secondary); color: white; }
+        .clickable { color: var(--info); cursor: pointer; font-weight: bold; text-decoration: underline; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); }
+        .modal-content { background: white; margin: 5% auto; padding: 25px; border-radius: 12px; width: 85%; max-width: 800px; position: relative; max-height: 85vh; overflow-y: auto; }
+        .close-modal { position: absolute; right: 20px; top: 15px; font-size: 24px; cursor: pointer; }
+
+        @media print {
+            .tabs, .controls, .section, .header, .action-col, .close-modal, button { display: none !important; }
+            .modal { display: block !important; position: relative; }
+            table { width: 100% !important; border: 1px solid #000; }
+            th { background: #f2f2f2 !important; color: black !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header"><h1>Learning IT BD - Management System</h1></div>
+
+    <div class="dashboard">
+        <div class="card"><h3>Total Students</h3><p id="totalStudents">0</p></div>
+        <div class="card"><h3>Total Collection</h3><p id="totalCollection">৳ 0</p></div>
+        <div class="card" style="border-left-color: var(--danger)"><h3>Total Due</h3><p id="totalDue" style="color:var(--danger)">৳ 0</p></div>
+        <div class="card"><h3>Referral Bonus</h3><p id="totalReferral">৳ 0</p></div>
+    </div>
+
+    <div class="controls">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab(event, 'admission')">Admission</button>
+            <button class="tab-btn" onclick="switchTab(event, 'studentList')">Student List</button>
+            <button class="tab-btn" onclick="switchTab(event, 'courseList')">Courses</button>
+            <button class="tab-btn" onclick="switchTab(event, 'referralList')">Referrals</button>
+        </div>
+        
+        <div class="filter-group">
+            <input type="text" id="liveSearch" class="search-box" placeholder="Search name, phone or ID..." oninput="applyAllFilters()">
+            <select id="courseFilter" class="course-filter" onchange="applyAllFilters()">
+                <option value="">All Courses</option>
+            </select>
+            <button class="btn-excel" onclick="exportReport()">Export</button>
+            <button class="btn-print" onclick="window.print()">Print</button>
+        </div>
+    </div>
+
+    <div id="admission" class="tab-content">
+        <div class="section">
+            <h3 id="formTitle">Student Admission</h3>
+            <input type="hidden" id="editId" value="">
+            <div class="grid-form" id="admissionForm">
+                <input type="text" id="stdName" placeholder="Full Name *" required>
+                <input type="text" id="stdMobile" placeholder="Phone Number *" required>
+                <select id="courseSelect" onchange="autoFee()" required>
+                    <option value="">-- Select Course * --</option>
+                </select>
+                <input type="number" id="totalFee" placeholder="Total Fee *" required>
+                <input type="text" id="referrer" placeholder="Referrer Name">
+                <input type="text" id="bookNo" placeholder="Book No">
+                <input type="text" id="receiptNo" placeholder="Receipt No *" required>
+                <input type="number" id="payAmt" placeholder="Initial Pay (৳)">
+                <input type="text" id="reciever" placeholder="Collected By (Name)">
+                <button class="btn-submit" id="saveBtn" onclick="saveStudent()">Confirm Admission</button>
+                <button id="cancelEdit" style="display:none; background:#95a5a6; color:white;" onclick="clearForm()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="studentList" class="tab-content" style="display:none;">
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr><th>ID</th><th>Student Info</th><th>Course</th><th>Last Receipt</th><th>Fee</th><th>Paid</th><th>Due</th><th class="action-col">Action</th></tr>
+                </thead>
+                <tbody id="studentBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="courseList" class="tab-content" style="display:none;">
+        <div class="section">
+            <h3>Course Management</h3>
+            <div class="grid-form">
+                <input type="text" id="cName" placeholder="Course Name">
+                <input type="number" id="cFee" placeholder="Default Fee">
+                <button class="btn-submit" onclick="addCourse()">Add Course</button>
+            </div>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead><tr><th>Course Name</th><th>Default Fee</th><th>Action</th></tr></thead>
+                <tbody id="courseBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="referralList" class="tab-content" style="display:none;">
+        <div class="table-container">
+            <table>
+                <thead><tr><th>Referrer Name</th><th>Total Referred</th><th>Bonus (৳)</th></tr></thead>
+                <tbody id="referralBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="ledgerModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <div id="ledgerContent"></div>
+    </div>
+</div>
+
+<script>
+    let students = JSON.parse(localStorage.getItem('LIT_ST_FINAL_X')) || [];
+    let courses = JSON.parse(localStorage.getItem('LIT_CR_FINAL_X')) || [{name: "Web Design", fee: 5000}];
+
+    // --- Switch Tab ---
+    function switchTab(e, id) {
+        document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).style.display = 'block';
+        if(e) e.currentTarget.classList.add('active');
+    }
+
+    // --- Course UI ---
+    function renderCourses() {
+        const body = document.getElementById('courseBody');
+        const sel = document.getElementById('courseSelect');
+        const filter = document.getElementById('courseFilter');
+        body.innerHTML = "";
+        sel.innerHTML = '<option value="">-- Select Course * --</option>';
+        filter.innerHTML = '<option value="">All Courses</option>';
+        
+        courses.forEach((c, idx) => {
+            body.innerHTML += `<tr><td>${c.name}</td><td>৳ ${c.fee}</td><td><button style="background:var(--danger);color:white;" onclick="courses.splice(${idx},1); renderCourses();">Del</button></td></tr>`;
+            sel.innerHTML += `<option value="${c.name}" data-fee="${c.fee}">${c.name}</option>`;
+            filter.innerHTML += `<option value="${c.name}">${c.name}</option>`;
+        });
+        localStorage.setItem('LIT_CR_FINAL_X', JSON.stringify(courses));
+    }
+
+    function addCourse() {
+        const n = document.getElementById('cName').value;
+        const f = document.getElementById('cFee').value;
+        if(n && f) { courses.push({name:n, fee:parseInt(f)}); renderCourses(); document.getElementById('cName').value=''; document.getElementById('cFee').value=''; }
+    }
+
+    function autoFee() {
+        const s = document.getElementById('courseSelect');
+        document.getElementById('totalFee').value = s.options[s.selectedIndex].getAttribute('data-fee') || "";
+    }
+
+    // --- Student Logic ---
+    function saveStudent() {
+        const eid = document.getElementById('editId').value;
+        const required = ['stdName', 'stdMobile', 'courseSelect', 'totalFee', 'receiptNo'];
+        let valid = true;
+
+        required.forEach(id => {
+            const el = document.getElementById(id);
+            if (!el.value) { el.classList.add('invalid-field'); valid = false; }
+            else { el.classList.remove('invalid-field'); }
+        });
+
+        if(!valid) return alert("Fill RED marked fields!");
+
+        const rec = document.getElementById('receiptNo').value;
+        if(students.some(s => s.history.some(h => h.receipt === rec) && s.id !== eid)) return alert("Duplicate Receipt!");
+
+        const pay = parseInt(document.getElementById('payAmt').value) || 0;
+        const collector = document.getElementById('reciever').value || "Not Set";
+
+        if(!eid) {
+            const sid = "LIT-" + Date.now().toString().slice(-4);
+            students.push({
+                id: sid, name: document.getElementById('stdName').value, mobile: document.getElementById('stdMobile').value,
+                course: document.getElementById('courseSelect').value, total: parseInt(document.getElementById('totalFee').value),
+                paid: pay, referrer: document.getElementById('referrer').value || "None",
+                lastBook: document.getElementById('bookNo').value, lastRec: rec, receiver: collector,
+                history: pay > 0 ? [{amt: pay, date: new Date().toLocaleString(), book: document.getElementById('bookNo').value, receipt: rec, by: collector}] : [],
+                timestamp: Date.now()
+            });
+        } else {
+            const s = students.find(x => x.id === eid);
+            s.name = document.getElementById('stdName').value;
+            s.mobile = document.getElementById('stdMobile').value;
+            s.course = document.getElementById('courseSelect').value;
+            s.total = parseInt(document.getElementById('totalFee').value);
+            s.referrer = document.getElementById('referrer').value;
+        }
+        refresh(); clearForm();
+    }
+
+    function refresh() {
+        localStorage.setItem('LIT_ST_FINAL_X', JSON.stringify(students));
+        const paid = students.reduce((a,b) => a + b.paid, 0);
+        const total = students.reduce((a,b) => a + b.total, 0);
+        document.getElementById('totalStudents').innerText = students.length;
+        document.getElementById('totalCollection').innerText = "৳ " + paid;
+        document.getElementById('totalDue').innerText = "৳ " + (total - paid);
+        let bonus = 0;
+        students.forEach(s => { if(s.referrer !== "None" && s.paid >= (s.total * 0.5)) bonus += 500; });
+        document.getElementById('totalReferral').innerText = "৳ " + bonus;
+        renderList(students); renderRefs();
+    }
+
+    function renderList(data) {
+        const body = document.getElementById('studentBody');
+        body.innerHTML = "";
+        data.sort((a,b) => b.timestamp - a.timestamp).forEach(s => {
+            const due = s.total - s.paid;
+            body.innerHTML += `<tr>
+                <td>${s.id}</td>
+                <td><b class="clickable" onclick="openLedger('${s.id}')">${s.name}</b><br><small>${s.mobile}</small></td>
+                <td>${s.course}</td>
+                <td>B:${s.lastBook}/R:${s.lastRec}</td>
+                <td>${s.total}</td>
+                <td style="color:green;font-weight:bold">${s.paid}</td>
+                <td style="color:${due > 0 ? 'red' : 'green'}"><b>${due}</b></td>
+                <td class="action-col">
+                    <button class="btn-edit" style="padding:5px 10px" onclick="editStudent('${s.id}')">Edit</button>
+                    ${due > 0 ? `<button class="btn-submit" style="padding:5px 10px" onclick="addPay('${s.id}')">Pay</button>` : '<span>Paid</span>'}
+                </td>
+            </tr>`;
+        });
+    }
+
+    // --- Combined Filters (Search + Course) ---
+    function applyAllFilters() {
+        const query = document.getElementById('liveSearch').value.toLowerCase();
+        const course = document.getElementById('courseFilter').value;
+        
+        const filtered = students.filter(s => {
+            const matchesSearch = s.name.toLowerCase().includes(query) || s.mobile.includes(query) || s.id.toLowerCase().includes(query);
+            const matchesCourse = course === "" || s.course === course;
+            return matchesSearch && matchesCourse;
+        });
+
+        if(query.length > 0 || course !== "") switchTab(null, 'studentList');
+        renderList(filtered);
+    }
+
+    function addPay(id) {
+        const s = students.find(x => x.id === id);
+        const due = s.total - s.paid;
+        const amt = prompt(`Current Due: ৳${due}\nEnter Installment Amount:`);
+        if(!amt || isNaN(amt) || parseInt(amt) <= 0) return;
+        if(parseInt(amt) > due) return alert("Exceeds balance!");
+
+        const rec = prompt("New Receipt Number:");
+        if(students.some(x => x.history.some(h => h.receipt === rec))) return alert("Duplicate Receipt!");
+        
+        const collector = prompt("Money Received By (Name):", s.receiver);
+        const book = prompt("Book Number:", s.lastBook);
+        
+        const p = parseInt(amt);
+        s.paid += p; s.lastRec = rec; s.lastBook = book; s.receiver = collector;
+        s.history.push({amt: p, date: new Date().toLocaleString(), book: book, receipt: rec, by: collector});
+        refresh();
+    }
+
+    function editStudent(id) {
+        const s = students.find(x => x.id === id);
+        document.getElementById('editId').value = s.id;
+        document.getElementById('stdName').value = s.name;
+        document.getElementById('stdMobile').value = s.mobile;
+        document.getElementById('courseSelect').value = s.course;
+        document.getElementById('totalFee').value = s.total;
+        document.getElementById('referrer').value = s.referrer;
+        document.getElementById('formTitle').innerText = "Update Mode";
+        document.getElementById('saveBtn').innerText = "Update Info";
+        document.getElementById('cancelEdit').style.display = "inline-block";
+        switchTab(null, 'admission');
+    }
+
+    function clearForm() {
+        document.getElementById('editId').value = "";
+        document.querySelectorAll('#admissionForm input, #admissionForm select').forEach(i => { i.value = ""; i.classList.remove('invalid-field'); });
+        document.getElementById('formTitle').innerText = "Student Admission";
+        document.getElementById('saveBtn').innerText = "Save Student";
+        document.getElementById('cancelEdit').style.display = "none";
+    }
+
+    function openLedger(id) {
+        const s = students.find(x => x.id === id);
+        document.getElementById('ledgerContent').innerHTML = `<h3>Ledger: ${s.name}</h3>
+            <table><thead><tr><th>Date</th><th>Book/Receipt</th><th>Amount</th><th>Received By</th></tr></thead>
+            <tbody>${s.history.map(h => `<tr><td>${h.date}</td><td>B:${h.book}/R:${h.receipt}</td><td>৳${h.amt}</td><td>${h.by}</td></tr>`).join('')}</tbody>
+            </table><br><b>Total Paid: ৳${s.paid} | Balance Due: ৳${s.total - s.paid}</b>`;
+        document.getElementById('ledgerModal').style.display = 'block';
+    }
+
+    function renderRefs() {
+        const body = document.getElementById('referralBody');
+        body.innerHTML = "";
+        let rs = {};
+        students.forEach(s => { if(s.referrer !== "None") {
+            if(!rs[s.referrer]) rs[s.referrer] = { count: 0, bonus: 0 };
+            rs[s.referrer].count++;
+            if(s.paid >= (s.total * 0.5)) rs[s.referrer].bonus += 500;
+        }});
+        for(let r in rs) body.innerHTML += `<tr><td>${r}</td><td>${rs[r].count}</td><td>৳ ${rs[r].bonus}</td></tr>`;
+    }
+
+    function exportReport() {
+        let csv = "ID,Name,Phone,Course,Fee,Paid,Due\n";
+        students.forEach(s => { csv += `${s.id},${s.name},${s.mobile},${s.course},${s.total},${s.paid},${s.total-s.paid}\n`; });
+        const b = new Blob([csv], {type:'text/csv'});
+        const u = window.URL.createObjectURL(b);
+        const a = document.createElement('a');
+        a.href = u; a.download = `Report_${new Date().toLocaleDateString()}.csv`; a.click();
+    }
+
+    function closeModal() { document.getElementById('ledgerModal').style.display = 'none'; }
+    renderCourses(); refresh();
+</script>
+
+</body>
+</html>
