@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,43 +9,30 @@
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; color: var(--text); }
         .container { max-width: 1300px; margin: auto; }
         .header { background: var(--primary); color: white; padding: 15px; text-align: center; border-radius: 8px; margin-bottom: 20px; }
-        
-        /* Dashboard */
         .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
         .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-left: 5px solid var(--accent); }
         .card h3 { margin: 0; color: #7f8c8d; font-size: 13px; text-transform: uppercase; }
         .card p { font-size: 22px; font-weight: bold; margin: 10px 0 0; color: var(--primary); }
-
-        /* Controls & Filter */
         .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 10px; flex-wrap: wrap; }
         .filter-group { display: flex; gap: 10px; flex-grow: 1; align-items: center; }
         .search-box { flex-grow: 2; padding: 12px 20px; border: 2px solid var(--primary); border-radius: 25px; outline: none; font-size: 15px; }
         .course-filter { flex-grow: 1; padding: 11px; border: 2px solid var(--primary); border-radius: 25px; outline: none; cursor: pointer; }
-        
-        /* Tabs */
         .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
         .tab-btn { background: #ddd; color: #333; padding: 10px 18px; cursor: pointer; border-radius: 5px; border: none; font-weight: 600; }
         .tab-btn.active { background: var(--primary); color: white; }
-        
-        /* Form & Validation */
         .section { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 30px; }
         .grid-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
         input, select { padding: 10px; border: 1px solid #ddd; border-radius: 5px; width: 100%; box-sizing: border-box; transition: 0.3s; }
         .invalid-field { border: 2px solid var(--danger) !important; background-color: #fff6f6; }
-        
         button { padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; border: none; }
         .btn-submit { background: var(--accent); color: white; }
         .btn-excel { background: #1d6f42; color: white; }
         .btn-print { background: var(--secondary); color: white; }
-
-        /* Table */
         .table-container { background: white; border-radius: 8px; overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         table { width: 100%; border-collapse: collapse; min-width: 1000px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
         th { background: var(--secondary); color: white; }
         .clickable { color: var(--info); cursor: pointer; font-weight: bold; text-decoration: underline; }
-
-        /* Modal */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); }
         .modal-content { background: white; margin: 5% auto; padding: 25px; border-radius: 12px; width: 85%; max-width: 800px; position: relative; max-height: 85vh; overflow-y: auto; }
         .close-modal { position: absolute; right: 20px; top: 15px; font-size: 24px; cursor: pointer; }
@@ -157,10 +143,36 @@
 </div>
 
 <script>
+    // --- ১. আপনার গুগল অ্যাপস স্ক্রিপ্ট লিঙ্ক এখানে বসান ---
+    const SCRIPT_URL = "YOUR_DEPLOYED_WEB_APP_URL"; 
+
     let students = JSON.parse(localStorage.getItem('LIT_ST_FINAL_X')) || [];
     let courses = JSON.parse(localStorage.getItem('LIT_CR_FINAL_X')) || [{name: "Web Design", fee: 5000}];
 
-    // --- Switch Tab ---
+    // গুগল শিট থেকে ডেটা লোড করার ফাংশন
+    async function fetchFromSheet() {
+        try {
+            const res = await fetch(SCRIPT_URL);
+            const data = await res.json();
+            if(data && data.length > 0) {
+                students = data;
+                refresh();
+            }
+        } catch (e) { console.log("Sheet empty or error", e); }
+    }
+
+    // গুগল শিটে ডেটা পাঠানোর ফাংশন
+    async function postToSheet(studentData) {
+        try {
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(studentData)
+            });
+        } catch (e) { console.error("Sync failed", e); }
+    }
+
     function switchTab(e, id) {
         document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -168,7 +180,6 @@
         if(e) e.currentTarget.classList.add('active');
     }
 
-    // --- Course UI ---
     function renderCourses() {
         const body = document.getElementById('courseBody');
         const sel = document.getElementById('courseSelect');
@@ -176,7 +187,6 @@
         body.innerHTML = "";
         sel.innerHTML = '<option value="">-- Select Course * --</option>';
         filter.innerHTML = '<option value="">All Courses</option>';
-        
         courses.forEach((c, idx) => {
             body.innerHTML += `<tr><td>${c.name}</td><td>৳ ${c.fee}</td><td><button style="background:var(--danger);color:white;" onclick="courses.splice(${idx},1); renderCourses();">Del</button></td></tr>`;
             sel.innerHTML += `<option value="${c.name}" data-fee="${c.fee}">${c.name}</option>`;
@@ -196,36 +206,33 @@
         document.getElementById('totalFee').value = s.options[s.selectedIndex].getAttribute('data-fee') || "";
     }
 
-    // --- Student Logic ---
     function saveStudent() {
         const eid = document.getElementById('editId').value;
         const required = ['stdName', 'stdMobile', 'courseSelect', 'totalFee', 'receiptNo'];
         let valid = true;
-
         required.forEach(id => {
             const el = document.getElementById(id);
             if (!el.value) { el.classList.add('invalid-field'); valid = false; }
             else { el.classList.remove('invalid-field'); }
         });
-
         if(!valid) return alert("Fill RED marked fields!");
 
-        const rec = document.getElementById('receiptNo').value;
-        if(students.some(s => s.history.some(h => h.receipt === rec) && s.id !== eid)) return alert("Duplicate Receipt!");
-
         const pay = parseInt(document.getElementById('payAmt').value) || 0;
+        const rec = document.getElementById('receiptNo').value;
         const collector = document.getElementById('reciever').value || "Not Set";
 
         if(!eid) {
             const sid = "LIT-" + Date.now().toString().slice(-4);
-            students.push({
+            const newStudent = {
                 id: sid, name: document.getElementById('stdName').value, mobile: document.getElementById('stdMobile').value,
                 course: document.getElementById('courseSelect').value, total: parseInt(document.getElementById('totalFee').value),
                 paid: pay, referrer: document.getElementById('referrer').value || "None",
                 lastBook: document.getElementById('bookNo').value, lastRec: rec, receiver: collector,
                 history: pay > 0 ? [{amt: pay, date: new Date().toLocaleString(), book: document.getElementById('bookNo').value, receipt: rec, by: collector}] : [],
                 timestamp: Date.now()
-            });
+            };
+            students.push(newStudent);
+            postToSheet(newStudent); // শিটে পাঠানো হচ্ছে
         } else {
             const s = students.find(x => x.id === eid);
             s.name = document.getElementById('stdName').value;
@@ -239,8 +246,8 @@
 
     function refresh() {
         localStorage.setItem('LIT_ST_FINAL_X', JSON.stringify(students));
-        const paid = students.reduce((a,b) => a + b.paid, 0);
-        const total = students.reduce((a,b) => a + b.total, 0);
+        const paid = students.reduce((a,b) => a + (parseInt(b.paid) || 0), 0);
+        const total = students.reduce((a,b) => a + (parseInt(b.total) || 0), 0);
         document.getElementById('totalStudents').innerText = students.length;
         document.getElementById('totalCollection').innerText = "৳ " + paid;
         document.getElementById('totalDue').innerText = "৳ " + (total - paid);
@@ -259,7 +266,7 @@
                 <td>${s.id}</td>
                 <td><b class="clickable" onclick="openLedger('${s.id}')">${s.name}</b><br><small>${s.mobile}</small></td>
                 <td>${s.course}</td>
-                <td>B:${s.lastBook}/R:${s.lastRec}</td>
+                <td>B:${s.lastBook || '-'}/R:${s.lastRec}</td>
                 <td>${s.total}</td>
                 <td style="color:green;font-weight:bold">${s.paid}</td>
                 <td style="color:${due > 0 ? 'red' : 'green'}"><b>${due}</b></td>
@@ -271,17 +278,14 @@
         });
     }
 
-    // --- Combined Filters (Search + Course) ---
     function applyAllFilters() {
         const query = document.getElementById('liveSearch').value.toLowerCase();
         const course = document.getElementById('courseFilter').value;
-        
         const filtered = students.filter(s => {
             const matchesSearch = s.name.toLowerCase().includes(query) || s.mobile.includes(query) || s.id.toLowerCase().includes(query);
             const matchesCourse = course === "" || s.course === course;
             return matchesSearch && matchesCourse;
         });
-
         if(query.length > 0 || course !== "") switchTab(null, 'studentList');
         renderList(filtered);
     }
@@ -292,13 +296,10 @@
         const amt = prompt(`Current Due: ৳${due}\nEnter Installment Amount:`);
         if(!amt || isNaN(amt) || parseInt(amt) <= 0) return;
         if(parseInt(amt) > due) return alert("Exceeds balance!");
-
         const rec = prompt("New Receipt Number:");
         if(students.some(x => x.history.some(h => h.receipt === rec))) return alert("Duplicate Receipt!");
-        
         const collector = prompt("Money Received By (Name):", s.receiver);
         const book = prompt("Book Number:", s.lastBook);
-        
         const p = parseInt(amt);
         s.paid += p; s.lastRec = rec; s.lastBook = book; s.receiver = collector;
         s.history.push({amt: p, date: new Date().toLocaleString(), book: book, receipt: rec, by: collector});
@@ -323,7 +324,7 @@
         document.getElementById('editId').value = "";
         document.querySelectorAll('#admissionForm input, #admissionForm select').forEach(i => { i.value = ""; i.classList.remove('invalid-field'); });
         document.getElementById('formTitle').innerText = "Student Admission";
-        document.getElementById('saveBtn').innerText = "Save Student";
+        document.getElementById('saveBtn').innerText = "Confirm Admission";
         document.getElementById('cancelEdit').style.display = "none";
     }
 
@@ -340,7 +341,7 @@
         const body = document.getElementById('referralBody');
         body.innerHTML = "";
         let rs = {};
-        students.forEach(s => { if(s.referrer !== "None") {
+        students.forEach(s => { if(s.referrer && s.referrer !== "None") {
             if(!rs[s.referrer]) rs[s.referrer] = { count: 0, bonus: 0 };
             rs[s.referrer].count++;
             if(s.paid >= (s.total * 0.5)) rs[s.referrer].bonus += 500;
@@ -353,12 +354,15 @@
         students.forEach(s => { csv += `${s.id},${s.name},${s.mobile},${s.course},${s.total},${s.paid},${s.total-s.paid}\n`; });
         const b = new Blob([csv], {type:'text/csv'});
         const u = window.URL.createObjectURL(b);
-        const a = document.createElement('a');
-        a.href = u; a.download = `Report_${new Date().toLocaleDateString()}.csv`; a.click();
+        const a = document.createElement('a'); a.href = u; a.download = `Report_${new Date().toLocaleDateString()}.csv`; a.click();
     }
 
     function closeModal() { document.getElementById('ledgerModal').style.display = 'none'; }
-    renderCourses(); refresh();
+
+    // Start
+    renderCourses();
+    refresh();
+    fetchFromSheet(); // অটোমেটিক শিট থেকে ডেটা নিয়ে আসবে
 </script>
 
 </body>
