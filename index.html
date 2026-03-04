@@ -3,103 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LIT BD - Management System</title>
+    <title>Learning IT BD - Advanced CRM</title>
     <style>
-        :root { --primary: #2c3e50; --secondary: #34495e; --accent: #27ae60; --danger: #e74c3c; --info: #3498db; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 1350px; margin: auto; }
+        :root { --primary: #0f172a; --secondary: #334155; --accent: #10b981; --danger: #ef4444; --info: #3b82f6; --bg: #f1f5f9; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); margin: 0; padding: 20px; color: var(--primary); }
+        .container { max-width: 1400px; margin: auto; }
         
-        /* Modern Inputs */
-        input, select { padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px; width: 100%; box-sizing: border-box; outline: none; transition: 0.3s; }
-        input:focus { border-color: var(--info); box-shadow: 0 0 10px rgba(52,152,219,0.1); }
+        /* Modern UI Elements */
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
+        .header { background: var(--primary); color: white; padding: 20px 30px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
         
-        .header { background: var(--primary); color: white; padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .card { background: white; padding: 20px; border-radius: 12px; border-left: 5px solid var(--accent); box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        /* Input Styling */
+        input, select { 
+            width: 100%; padding: 12px 16px; border: 1.5px solid #e2e8f0; border-radius: 10px; 
+            font-size: 14px; transition: all 0.2s; outline: none; background: #fff;
+        }
+        input:focus { border-color: var(--info); ring: 2px var(--info); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        label { font-size: 13px; font-weight: 600; color: var(--secondary); margin-bottom: 6px; display: block; }
+
+        /* Dashboard Stats */
+        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 24px; border-radius: 16px; display: flex; flex-direction: column; border-bottom: 4px solid var(--accent); }
+        .stat-card h3 { margin: 0; font-size: 14px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+        .stat-card p { font-size: 28px; font-weight: 800; margin: 10px 0 0; }
+
+        /* Tabs & Controls */
+        .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 15px; flex-wrap: wrap; }
+        .tabs { display: flex; gap: 8px; background: #e2e8f0; padding: 5px; border-radius: 12px; }
+        .tab-btn { padding: 10px 20px; cursor: pointer; border-radius: 8px; border: none; font-weight: 600; color: var(--secondary); background: transparent; transition: 0.3s; }
+        .tab-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        .tab-btn { background: #eee; padding: 12px 20px; cursor: pointer; border-radius: 8px; border: none; font-weight: bold; }
-        .tab-btn.active { background: var(--primary); color: white; }
-        
-        .table-container { background: white; border-radius: 12px; overflow-x: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .search-box { position: relative; width: 350px; }
+        .search-box input { padding-left: 40px; border-radius: 12px; }
+
+        /* Tables */
+        .table-container { background: white; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; }
         table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #f1f1f1; }
-        th { background: var(--secondary); color: white; }
-        .clickable { color: var(--info); cursor: pointer; text-decoration: underline; font-weight: bold; }
+        th { background: #f8fafc; padding: 16px; text-align: left; font-size: 13px; font-weight: 600; color: #64748b; border-bottom: 1px solid #e2e8f0; }
+        td { padding: 16px; font-size: 14px; border-bottom: 1px solid #f1f5f9; }
+        .clickable { color: var(--info); cursor: pointer; font-weight: bold; }
+        .clickable:hover { text-decoration: underline; }
 
-        .btn-pay { background: var(--danger); color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; }
-        .btn-print { background: var(--info); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
+        /* Buttons */
+        .btn { padding: 10px 18px; border-radius: 10px; font-weight: 600; cursor: pointer; border: none; transition: 0.2s; }
+        .btn-primary { background: var(--info); color: white; }
+        .btn-success { background: var(--accent); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-pay { background: var(--danger); color: white; padding: 6px 14px; font-size: 13px; }
 
-        #loginOverlay { position: fixed; top:0; left:0; width:100%; height:100%; background: #2c3e50; z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        .login-box { background: white; padding: 40px; border-radius: 15px; text-align: center; width: 320px; }
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
-        .modal-content { background: white; margin: 5% auto; padding: 30px; border-radius: 15px; width: 90%; max-width: 600px; max-height: 85vh; overflow-y: auto; }
+        /* Modals */
+        #loginOverlay { position: fixed; inset: 0; background: var(--primary); z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        .login-box { background: white; padding: 40px; border-radius: 24px; text-align: center; width: 380px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+        .modal { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px); }
+        .modal-content { background: white; margin: 50px auto; padding: 32px; border-radius: 20px; width: 90%; max-width: 600px; max-height: 85vh; overflow-y: auto; position: relative; }
 
-        @media print { .tabs, .header, .search-box, .action-col, .tab-content:not(#studentList), #loginOverlay { display: none !important; } }
+        @media print { .tabs, .header, .btn, .action-col, #admission, .search-box { display: none !important; } }
     </style>
 </head>
 <body>
 
-<div id="loginOverlay"><div class="login-box"><h2>LIT BD ACCESS</h2><input type="text" id="username" placeholder="User" style="margin-bottom:10px"><input type="password" id="password" placeholder="Pass" style="margin-bottom:20px"><button onclick="checkLogin()" style="width:100%; padding:12px; background:var(--accent); color:white; border:none; border-radius:8px;">Login</button></div></div>
+<div id="loginOverlay">
+    <div class="login-box">
+        <h2 style="margin-bottom:10px;">Welcome Back</h2>
+        <p style="color:#64748b; margin-bottom:30px;">Login to LIT BD Management</p>
+        <input type="text" id="username" placeholder="Username" style="margin-bottom:15px">
+        <input type="password" id="password" placeholder="Password" style="margin-bottom:25px">
+        <button onclick="checkLogin()" class="btn btn-primary" style="width:100%; padding:14px;">Sign In</button>
+    </div>
+</div>
 
 <div class="container" id="mainContent" style="display:none;">
     <div class="header">
-        <h2>Learning IT BD</h2>
-        <div><button class="btn-print" onclick="window.print()">Print Report</button><button onclick="logout()" style="margin-left:10px; background:var(--danger); color:white; border:none; padding:10px; border-radius:8px;">Logout</button></div>
+        <h2 style="margin:0; font-weight:800; letter-spacing:-0.02em;">LIT BD CRM</h2>
+        <div>
+            <button class="btn btn-primary" style="background:#475569" onclick="window.print()">Print Report</button>
+            <button class="btn btn-danger" onclick="logout()" style="margin-left:10px">Logout</button>
+        </div>
     </div>
 
     <div class="dashboard">
-        <div class="card"><h3>Students</h3><p id="totalStudents">0</p></div>
-        <div class="card"><h3>Collection</h3><p id="totalCollection">৳ 0</p></div>
-        <div class="card" style="border-left-color: var(--danger)"><h3>Due</h3><p id="totalDue">৳ 0</p></div>
-        <div class="card" style="border-left-color: var(--info)"><h3>Bonus</h3><p id="totalReferral">৳ 0</p></div>
+        <div class="stat-card"><h3>Total Students</h3><p id="totalStudents">0</p></div>
+        <div class="stat-card"><h3>Total Collection</h3><p id="totalCollection">৳ 0</p></div>
+        <div class="stat-card" style="border-color: var(--danger)"><h3>Total Due</h3><p id="totalDue">৳ 0</p></div>
+        <div class="stat-card" style="border-color: var(--info)"><h3>Referral Bonus</h3><p id="totalReferral">৳ 0</p></div>
     </div>
 
-    <div class="tabs">
-        <button class="tab-btn active" id="bAdm" onclick="switchTab(event, 'admission')">Admission</button>
-        <button class="tab-btn" id="bList" onclick="switchTab(event, 'studentList')">Student List</button>
-        <button class="tab-btn" onclick="switchTab(event, 'referralList')">Referrals</button>
-        <button class="tab-btn" onclick="switchTab(event, 'courseList')">Courses</button>
-        <input type="text" id="liveSearch" style="width:300px; border-radius:25px; padding-left:20px; border:1px solid #ccc; margin-left:auto;" placeholder="Fast Search Anything..." oninput="applySearch()">
+    <div class="controls">
+        <div class="tabs">
+            <button class="tab-btn active" id="btnAdm" onclick="switchTab(event, 'admission')">Admission</button>
+            <button class="tab-btn" id="btnList" onclick="switchTab(event, 'studentList')">Student List</button>
+            <button class="tab-btn" onclick="switchTab(event, 'referralList')">Referrals</button>
+            <button class="tab-btn" onclick="switchTab(event, 'courseList')">Courses</button>
+        </div>
+        <div class="search-box">
+            <input type="text" id="liveSearch" placeholder="Search ID, Name, Receipt..." oninput="applySearch()">
+        </div>
     </div>
 
     <div id="admission" class="tab-content">
-        <div class="card" style="border:none; padding:30px;">
-            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:15px;" id="admissionForm">
-                <input type="text" id="stdName" placeholder="Full Name *">
-                <input type="text" id="stdMobile" placeholder="Phone *">
-                <select id="courseSelect" onchange="autoFee()"></select>
-                <input type="number" id="totalFee" placeholder="Fee *">
-                <input type="text" id="referrer" placeholder="Referrer">
-                <input type="text" id="bookNo" placeholder="Book No *">
-                <input type="text" id="receiptNo" placeholder="Receipt No *">
-                <input type="number" id="payAmt" placeholder="Initial Pay">
-                <input type="text" id="reciever" placeholder="Receiver *">
-                <button onclick="saveStudent()" style="background:var(--accent); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Save Admission</button>
+        <div class="card" style="padding:40px;">
+            <h3 style="margin-top:0; margin-bottom:25px;">Registration Form</h3>
+            <div class="grid-form" id="admissionForm">
+                <div><label>Full Name *</label><input type="text" id="stdName" placeholder="Enter name"></div>
+                <div><label>Phone Number *</label><input type="text" id="stdMobile" placeholder="01XXX-XXXXXX"></div>
+                <div><label>Select Course *</label><select id="courseSelect" onchange="autoFee()"></select></div>
+                <div><label>Total Fee *</label><input type="number" id="totalFee"></div>
+                <div><label>Referrer Name</label><input type="text" id="referrer" placeholder="None"></div>
+                <div><label>Book Number *</label><input type="text" id="bookNo"></div>
+                <div><label>Receipt Number *</label><input type="text" id="receiptNo"></div>
+                <div><label>Initial Payment</label><input type="number" id="payAmt" placeholder="0"></div>
+                <div><label>Receiver Name *</label><input type="text" id="reciever"></div>
+                <div style="grid-column: span 1 / -1; margin-top:10px;"><button onclick="saveStudent()" class="btn btn-success" style="width:100%; padding:15px;">Complete Admission</button></div>
             </div>
         </div>
     </div>
 
     <div id="studentList" class="tab-content" style="display:none;">
-        <div class="table-container"><table><thead><tr><th>ID</th><th>Student Details</th><th>Course</th><th>Book/Rec</th><th>Paid</th><th>Due</th><th class="action-col">Action</th></tr></thead><tbody id="studentBody"></tbody></table></div>
+        <div class="table-container">
+            <table>
+                <thead><tr><th>ID</th><th>Student Details</th><th>Course</th><th>Last Rec</th><th>Total</th><th>Paid</th><th>Due</th><th class="action-col">Action</th></tr></thead>
+                <tbody id="studentBody"></tbody>
+            </table>
+        </div>
     </div>
 
     <div id="referralList" class="tab-content" style="display:none;">
-        <div class="table-container"><table><thead><tr><th>Referrer</th><th>Students</th><th>Bonus (৳)</th></tr></thead><tbody id="referralBody"></tbody></table></div>
+        <div class="table-container"><table><thead><tr><th>Referrer Name</th><th>Students</th><th>Earnings (৳)</th></tr></thead><tbody id="referralBody"></tbody></table></div>
     </div>
 
     <div id="courseList" class="tab-content" style="display:none;">
-        <div style="display:flex; gap:10px; margin-bottom:20px;"><input type="text" id="cName" placeholder="Course"><input type="number" id="cFee" placeholder="Fee"><button onclick="addCourse()" style="background:var(--primary); color:white; border:none; padding:10px 20px; border-radius:8px;">Add</button></div>
-        <div class="table-container"><table id="courseTable"></table></div>
+        <div class="card"><div class="grid-form"><input type="hidden" id="cIdx" value=""><input type="text" id="cName" placeholder="Course Name"><input type="number" id="cFee" placeholder="Fee"><button onclick="addCourse()" id="cBtn" class="btn btn-primary">Add Course</button></div></div>
+        <div class="table-container" style="margin-top:20px;"><table id="courseTable"></table></div>
     </div>
 </div>
 
-<div id="ledgerModal" class="modal"><div class="modal-content"><span onclick="closeLedger()" style="float:right; cursor:pointer; font-size:24px;">&times;</span><div id="ledgerContent"></div></div></div>
+<div id="payModal" class="modal">
+    <div class="modal-content">
+        <h3>Installment Payment</h3>
+        <input type="hidden" id="payId">
+        <label>Amount (৳) *</label><input type="number" id="instAmt">
+        <label>Book Number *</label><input type="text" id="instBook">
+        <label>Receipt Number *</label><input type="text" id="instRec">
+        <label>Receiver *</label><input type="text" id="instBy">
+        <div style="display:flex; gap:12px; margin-top:25px;">
+            <button onclick="confirmPayment()" class="btn btn-success" style="flex:1">Save Payment</button>
+            <button onclick="closePayModal()" class="btn" style="flex:1; background:#e2e8f0;">Cancel</button>
+        </div>
+    </div>
+</div>
 
-<div id="payModal" class="modal"><div class="modal-content"><h3>Installment</h3><input type="hidden" id="payId"><label>Amount</label><input type="number" id="instAmt"><label>Book No</label><input type="text" id="instBook"><label>Receipt No</label><input type="text" id="instRec"><label>By</label><input type="text" id="instBy"><div style="display:flex; gap:10px; margin-top:15px;"><button onclick="confirmPayment()" style="flex:1; background:var(--accent); color:white; border:none; padding:10px; border-radius:8px;">Save</button><button onclick="closePayModal()" style="flex:1; background:#ccc; border:none; border-radius:8px;">Cancel</button></div></div></div>
+<div id="ledgerModal" class="modal"><div class="modal-content"><span onclick="closeLedger()" style="float:right; cursor:pointer; font-weight:800; font-size:20px;">&times;</span><div id="ledgerContent"></div></div></div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwvea4rYHPF2InP4nAV5fnsIyibroIEXduuZIQV0QZrHKKuqhCFgMuIh3iFUgZMHHo6/exec"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwLcVRKzdMeTqkFrP9SVYQcJM-fs_krh3kCb25-0fPPz3Ser6ghUbHX3O0Y4-lmJOE/exec"; 
     let students = [];
     let courses = JSON.parse(localStorage.getItem('LIT_CR_X')) || [{name: "Web Design", fee: 5000}];
 
@@ -108,7 +164,7 @@
             document.getElementById('loginOverlay').style.display = 'none';
             document.getElementById('mainContent').style.display = 'block';
             fetchFromSheet();
-        } else alert("Wrong Pass!");
+        } else alert("Invalid credentials!");
     }
     function logout() { location.reload(); }
 
@@ -126,9 +182,10 @@
         return text.split('\n').map(line => {
             let amt = line.match(/৳(\d+)/)?.[1] || 0;
             let date = line.match(/Date: ([^|]+)/)?.[1]?.trim() || "";
+            let book = line.match(/Book: ([^|]+)/)?.[1]?.trim() || "";
             let rec = line.match(/Rec: ([^|]+)/)?.[1]?.trim() || "";
             let by = line.match(/By: ([^)]+)/)?.[1]?.trim() || "";
-            return {amt, date, receipt: rec, by};
+            return {amt, date, book, receipt: rec, by};
         });
     }
 
@@ -136,23 +193,30 @@
         await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
     }
 
+    // লাইভ সার্চ ১০০% ফিক্সড
     function applySearch() {
         const q = document.getElementById('liveSearch').value.toLowerCase();
         const filtered = students.filter(s => 
-            s.id.toString().includes(q) || s.name.toLowerCase().includes(q) || s.mobile.includes(q) || 
-            s.course.toLowerCase().includes(q) || s.referrer.toLowerCase().includes(q) || 
-            s.lastRec.toString().includes(q) || s.receiver.toLowerCase().includes(q)
+            s.name.toLowerCase().includes(q) || 
+            s.mobile.includes(q) || 
+            s.id.toString().includes(q) ||
+            s.lastRec.toString().includes(q)
         );
         renderList(filtered);
-        if(q) switchTab(null, 'studentList');
+        if(q) {
+            document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+            document.getElementById('studentList').style.display = 'block';
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btnList').classList.add('active');
+        }
     }
 
     function saveStudent() {
         const req = ['stdName','stdMobile','courseSelect','totalFee','bookNo','receiptNo','reciever'];
-        for(let f of req) if(!document.getElementById(f).value) return alert("Fill * Fields");
+        for(let f of req) if(!document.getElementById(f).value) return alert("Fill all * fields!");
         const rec = document.getElementById('receiptNo').value;
-        if(students.some(s => s.lastRec == rec || s.historyList.some(h => h.receipt == rec))) return alert("Dup Rec!");
-        
+        if(getAllReceipts().includes(rec)) return alert("Receipt Number already used!");
+
         const sid = Date.now().toString().slice(-6);
         const pay = parseInt(document.getElementById('payAmt').value) || 0;
         const newSt = {
@@ -160,43 +224,56 @@
             course: document.getElementById('courseSelect').value, total: parseInt(document.getElementById('totalFee').value),
             paid: pay, referrer: document.getElementById('referrer').value || "None",
             lastBook: document.getElementById('bookNo').value, lastRec: rec, receiver: document.getElementById('reciever').value,
-            historyList: pay > 0 ? [{amt: pay, date: new Date().toLocaleDateString(), receipt: rec, by: document.getElementById('reciever').value, book: document.getElementById('bookNo').value}] : [],
+            historyList: pay > 0 ? [{amt: pay, date: new Date().toLocaleDateString(), book: document.getElementById('bookNo').value, receipt: rec, by: document.getElementById('reciever').value}] : [],
             timestamp: new Date().toLocaleString()
         };
         students.push(newSt); postToSheet(newSt); refresh();
+        document.querySelectorAll('#admissionForm input').forEach(i => i.value = "");
         switchTab(null, 'studentList');
+    }
+
+    function getAllReceipts() {
+        let rs = [];
+        students.forEach(s => { rs.push(s.lastRec); s.historyList.forEach(h => rs.push(h.receipt)); });
+        return rs;
     }
 
     function renderList(data) {
         const body = document.getElementById('studentBody'); body.innerHTML = "";
-        data.sort((a,b)=> b.id - a.id).forEach(s => {
+        data.sort((a,b) => b.id - a.id).forEach(s => {
             const due = s.total - s.paid;
-            body.innerHTML += `<tr><td>${s.id}</td><td><b class="clickable" onclick="openLedger('${s.id}')">${s.name}</b><br>${s.mobile}</td><td>${s.course}</td><td>B:${s.lastBook}/R:${s.lastRec}</td><td>${s.paid}</td><td style="color:${due>0?'red':'green'}; font-weight:bold">${due}</td><td class="action-col">${due>0?`<button class="btn-pay" onclick="openPayModal('${s.id}')">Pay</button>`:`<b style="color:green">Paid</b>`}</td></tr>`;
+            body.innerHTML += `<tr>
+                <td>${s.id}</td>
+                <td><b class="clickable" onclick="openLedger('${s.id}')">${s.name}</b><br><small>${s.mobile}</small></td>
+                <td>${s.course}</td><td>B:${s.lastBook}/R:${s.lastRec}</td>
+                <td>${s.total}</td><td>${s.paid}</td>
+                <td style="color:${due>0?'var(--danger)':'var(--accent)'}; font-weight:800">${due}</td>
+                <td class="action-col">${due>0?`<button class="btn btn-pay" onclick="openPayModal('${s.id}')">Pay</button>`:`<b style="color:var(--accent)">Paid</b>`}</td>
+            </tr>`;
         });
     }
 
-    function renderRefs() {
-        const body = document.getElementById('referralBody'); body.innerHTML = "";
+    function refresh() {
+        document.getElementById('totalStudents').innerText = students.length;
+        document.getElementById('totalCollection').innerText = "৳ " + students.reduce((a,b)=>a+(parseInt(b.paid)||0),0);
+        document.getElementById('totalDue').innerText = "৳ " + students.reduce((a,b)=>a+(parseInt(b.total-b.paid)||0),0);
+        
         let rs = {}, bonus = 0;
         students.forEach(s => { if(s.referrer && s.referrer !== "None") { if(!rs[s.referrer]) rs[s.referrer] = []; rs[s.referrer].push(s); } });
+        document.getElementById('referralBody').innerHTML = "";
         for(let r in rs) {
             let b = rs[r].filter(s => s.paid >= (s.total*0.5)).length * 500; bonus += b;
-            body.innerHTML += `<tr><td><b class="clickable" onclick="showRefDetails('${r}')">${r}</b></td><td>${rs[r].length}</td><td>৳${b}</td></tr>`;
+            document.getElementById('referralBody').innerHTML += `<tr><td><b class="clickable" onclick="showRefInfo('${r}')">${r}</b></td><td>${rs[r].length}</td><td>৳${b}</td></tr>`;
         }
         document.getElementById('totalReferral').innerText = "৳ " + bonus;
+        renderList(students);
     }
 
-    function showRefDetails(ref) {
+    function showRefInfo(ref) {
         const list = students.filter(s => s.referrer === ref);
-        let h = `<h3>Ref: ${ref}</h3><table border="1" style="width:100%"><thead><tr><th>Name</th><th>Course</th><th>Paid</th><th>Due</th></tr></thead><tbody>`;
-        list.forEach(s => h += `<tr><td>${s.name}</td><td>${s.course}</td><td>${s.paid}</td><td>${s.total-s.paid}</td></tr>`);
+        let h = `<h3>Ref: ${ref}</h3><table><thead><tr><th>Name</th><th>Course</th><th>Paid</th><th>Ledger</th></tr></thead><tbody>`;
+        list.forEach(s => h += `<tr><td>${s.name}</td><td>${s.course}</td><td>${s.paid}</td><td><small>${s.history.replace(/\n/g, '<br>')}</small></td></tr>`);
         document.getElementById('ledgerContent').innerHTML = h + "</tbody></table>";
-        document.getElementById('ledgerModal').style.display = 'block';
-    }
-
-    function openLedger(id) {
-        const s = students.find(x => x.id == id);
-        document.getElementById('ledgerContent').innerHTML = `<h3>Ledger: ${s.name}</h3><div style="background:#f9f9f9; padding:20px; border-radius:10px; line-height:2;">${s.history.replace(/\n/g, '<br>')}</div><br><b>Due: ৳${s.total-s.paid}</b>`;
         document.getElementById('ledgerModal').style.display = 'block';
     }
 
@@ -214,19 +291,19 @@
         const rec = document.getElementById('instRec').value;
         const book = document.getElementById('instBook').value;
         const by = document.getElementById('instBy').value;
-        if(!amt || !rec) return alert("Fill Fields");
+        if(!amt || !rec) return alert("All fields are mandatory");
+        if(getAllReceipts().includes(rec)) return alert("Duplicate Receipt!");
+        
         const s = students.find(x => x.id == id);
-        if(students.some(st => st.lastRec == rec || st.historyList.some(h => h.receipt == rec))) return alert("Dup Rec!");
         s.paid += amt; s.lastRec = rec; s.lastBook = book; s.receiver = by;
         s.historyList.push({amt, date: new Date().toLocaleDateString(), book, receipt: rec, by});
         postToSheet(s); closePayModal(); refresh();
     }
 
-    function refresh() {
-        document.getElementById('totalStudents').innerText = students.length;
-        document.getElementById('totalCollection').innerText = "৳ " + students.reduce((a,b)=>a+(parseInt(b.paid)||0),0);
-        document.getElementById('totalDue').innerText = "৳ " + students.reduce((a,b)=>a+(parseInt(b.total-b.paid)||0),0);
-        renderList(students); renderRefs();
+    function openLedger(id) {
+        const s = students.find(x => x.id == id);
+        document.getElementById('ledgerContent').innerHTML = `<h3>Ledger: ${s.name}</h3><div style="background:#f8fafc; padding:25px; border-radius:16px; line-height:2.2; font-family:monospace;">${s.history.replace(/\n/g, '<br>')}</div><br><b>Total Due: ৳${s.total-s.paid}</b>`;
+        document.getElementById('ledgerModal').style.display = 'block';
     }
 
     function switchTab(e, id) {
@@ -234,16 +311,29 @@
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(id).style.display = 'block';
         if(e) e.currentTarget.classList.add('active');
-        else document.getElementById(id==='studentList'?'bList':'bAdm').classList.add('active');
+        else document.getElementById(id === 'studentList' ? 'btnList' : 'btnAdm').classList.add('active');
     }
 
     function renderCourses() {
         const sel = document.getElementById('courseSelect'); const tbl = document.getElementById('courseTable');
-        sel.innerHTML = '<option value="">-- Course --</option>'; tbl.innerHTML = "<tr><th>Course</th><th>Fee</th><th>Action</th></tr>";
-        courses.forEach((c, i) => { sel.innerHTML += `<option value="${c.name}" data-fee="${c.fee}">${c.name}</option>`; tbl.innerHTML += `<tr><td>${c.name}</td><td>${c.fee}</td><td><button onclick="courses.splice(${i},1);renderCourses()">Del</button></td></tr>`; });
+        sel.innerHTML = '<option value="">-- Select Course --</option>'; tbl.innerHTML = "<tr><th>Course</th><th>Fee</th><th>Action</th></tr>";
+        courses.forEach((c, i) => { 
+            sel.innerHTML += `<option value="${c.name}" data-fee="${c.fee}">${c.name}</option>`; 
+            tbl.innerHTML += `<tr><td>${c.name}</td><td>${c.fee}</td><td><button class="btn" style="background:#f1f5f9" onclick="editCourse(${i})">Edit</button><button class="btn btn-danger" style="margin-left:5px" onclick="delCourse(${i})">Del</button></td></tr>`; 
+        });
         localStorage.setItem('LIT_CR_X', JSON.stringify(courses));
     }
-    function addCourse() { courses.push({name: document.getElementById('cName').value, fee: document.getElementById('cFee').value}); renderCourses(); }
+    function addCourse() {
+        const n = document.getElementById('cName').value; const f = document.getElementById('cFee').value; const idx = document.getElementById('cIdx').value;
+        if(idx !== "") courses[idx] = {name: n, fee: f}; else courses.push({name: n, fee: f});
+        document.getElementById('cIdx').value = ""; document.getElementById('cName').value = ""; document.getElementById('cFee').value = "";
+        document.getElementById('cBtn').innerText = "Add Course"; renderCourses();
+    }
+    function editCourse(i) {
+        document.getElementById('cName').value = courses[i].name; document.getElementById('cFee').value = courses[i].fee;
+        document.getElementById('cIdx').value = i; document.getElementById('cBtn').innerText = "Update Course";
+    }
+    function delCourse(i) { courses.splice(i,1); renderCourses(); }
     function autoFee() { document.getElementById('totalFee').value = document.getElementById('courseSelect').options[document.getElementById('courseSelect').selectedIndex].getAttribute('data-fee') || ""; }
     function closePayModal() { document.getElementById('payModal').style.display = 'none'; }
     function closeLedger() { document.getElementById('ledgerModal').style.display = 'none'; }
