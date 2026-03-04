@@ -8,27 +8,47 @@
         :root { --primary: #2c3e50; --secondary: #34495e; --accent: #27ae60; --text: #2c3e50; --danger: #e74c3c; --info: #3498db; }
         body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; padding: 20px; }
         .container { max-width: 1300px; margin: auto; }
-        #loginOverlay { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--primary); z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        .login-box { background: white; padding: 40px; border-radius: 10px; text-align: center; width: 350px; }
-        .login-box input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; }
+        
+        /* Dashboard & UI */
         .header { background: var(--primary); color: white; padding: 15px; text-align: center; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
         .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
         .card { background: white; padding: 20px; border-radius: 8px; border-left: 5px solid var(--accent); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .controls { display: flex; justify-content: space-between; margin-bottom: 20px; gap: 10px; }
-        .search-box { flex-grow: 2; padding: 12px 20px; border-radius: 25px; border: 1px solid var(--primary); outline: none; }
-        .tabs { display: flex; gap: 8px; margin-bottom: 10px; }
-        .tab-btn { background: #ddd; padding: 10px 18px; cursor: pointer; border-radius: 5px; border: none; font-weight: 600; }
+        
+        /* Tabs */
+        .tabs { display: flex; gap: 8px; margin-bottom: 15px; }
+        .tab-btn { background: #ddd; padding: 10px 18px; cursor: pointer; border-radius: 5px; border: none; font-weight: bold; }
         .tab-btn.active { background: var(--primary); color: white; }
-        .section { background: white; padding: 25px; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .grid-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
-        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
-        table { width: 100%; border-collapse: collapse; background: white; }
+        
+        /* Buttons */
+        .btn-pay { background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-paid { background: var(--accent); color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: bold; cursor: default; }
+        
+        /* Table Styles */
+        .table-container { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
         th { background: var(--secondary); color: white; }
-        .clickable { color: var(--info); cursor: pointer; font-weight: bold; text-decoration: underline; }
+        .clickable { color: var(--info); cursor: pointer; text-decoration: underline; font-weight: bold; }
+
+        /* Login */
+        #loginOverlay { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--primary); z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        .login-box { background: white; padding: 40px; border-radius: 10px; text-align: center; width: 350px; }
+        .login-box input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+
+        /* Print Styles */
+        @media print {
+            .tabs, .controls, .header, .btn-pay, #admission, #courseList, .login-box, #loginOverlay, .action-col { display: none !important; }
+            body { background: white; padding: 0; }
+            .container { max-width: 100%; }
+            .card { box-shadow: none; border: 1px solid #ddd; }
+            .table-container { box-shadow: none; border: 1px solid #000; }
+            th { background: #eee !important; color: black !important; }
+        }
+
+        /* Modal */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); }
-        .modal-content { background: white; margin: 5% auto; padding: 25px; border-radius: 12px; width: 85%; max-width: 850px; position: relative; max-height: 85vh; overflow-y: auto; }
-        .close-modal { position: absolute; right: 20px; top: 15px; font-size: 24px; cursor: pointer; }
+        .modal-content { background: white; margin: 5% auto; padding: 25px; border-radius: 12px; width: 90%; max-width: 800px; max-height: 80vh; overflow-y: auto; }
     </style>
 </head>
 <body>
@@ -38,27 +58,30 @@
         <h2>LIT BD Admin</h2>
         <input type="text" id="username" placeholder="Username">
         <input type="password" id="password" placeholder="Password">
-        <button onclick="checkLogin()" style="width:100%; padding:12px; background:var(--accent); color:white; border:none; border-radius:5px;">Login</button>
+        <button onclick="checkLogin()" style="width:100%; padding:12px; background:var(--accent); color:white; border:none; border-radius:5px; cursor:pointer;">Login</button>
     </div>
 </div>
 
 <div class="container" id="mainContent" style="display:none;">
     <div class="header">
-        <h1>Student Management</h1>
-        <button onclick="logout()" style="background:var(--danger); color:white; border:none; padding:8px 15px; border-radius:5px;">Logout</button>
+        <h1>Student Management System</h1>
+        <div>
+            <button onclick="window.print()" style="background:var(--info); color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">Print Report</button>
+            <button onclick="logout()" style="background:var(--danger); color:white; border:none; padding:8px 15px; border-radius:5px; margin-left:10px;">Logout</button>
+        </div>
     </div>
 
     <div class="dashboard">
         <div class="card"><h3>Total Students</h3><p id="totalStudents">0</p></div>
         <div class="card"><h3>Collection</h3><p id="totalCollection">৳ 0</p></div>
         <div class="card" style="border-left-color: var(--danger)"><h3>Total Due</h3><p id="totalDue">৳ 0</p></div>
-        <div class="card"><h3>Ref. Bonus</h3><p id="totalReferral">৳ 0</p></div>
+        <div class="card" style="border-left-color: var(--info)"><h3>Ref. Total</h3><p id="totalReferral">৳ 0</p></div>
     </div>
 
     <div class="controls">
         <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab(event, 'admission')">Admission</button>
-            <button class="tab-btn" onclick="switchTab(event, 'studentList')">Student List</button>
+            <button class="tab-btn active" id="btn-adm" onclick="switchTab(event, 'admission')">Admission</button>
+            <button class="tab-btn" id="btn-list" onclick="switchTab(event, 'studentList')">Student List</button>
             <button class="tab-btn" onclick="switchTab(event, 'referralList')">Referrals</button>
             <button class="tab-btn" onclick="switchTab(event, 'courseList')">Courses</button>
         </div>
@@ -67,7 +90,7 @@
 
     <div id="admission" class="tab-content">
         <div class="section">
-            <h3 id="formTitle">New Admission</h3>
+            <h3>New Admission</h3>
             <div class="grid-form" id="admissionForm">
                 <input type="text" id="stdName" placeholder="Full Name *">
                 <input type="text" id="stdMobile" placeholder="Phone Number *">
@@ -78,7 +101,7 @@
                 <input type="text" id="receiptNo" placeholder="Receipt No *">
                 <input type="number" id="payAmt" placeholder="Initial Pay (৳)">
                 <input type="text" id="reciever" placeholder="Collected By">
-                <button onclick="saveStudent()" style="background:var(--accent); color:white; border:none; padding:10px; border-radius:5px; font-weight:bold;">Confirm Admission</button>
+                <button onclick="saveStudent()" style="background:var(--accent); color:white; border:none; padding:12px; border-radius:5px; cursor:pointer; font-weight:bold;">Confirm Admission</button>
             </div>
         </div>
     </div>
@@ -86,7 +109,7 @@
     <div id="studentList" class="tab-content" style="display:none;">
         <div class="table-container">
             <table>
-                <thead><tr><th>ID</th><th>Info</th><th>Course</th><th>Rec</th><th>Fee</th><th>Paid</th><th>Due</th><th>Action</th></tr></thead>
+                <thead><tr><th>ID</th><th>Student Info</th><th>Course</th><th>Rec</th><th>Fee</th><th>Paid</th><th>Due</th><th class="action-col">Action</th></tr></thead>
                 <tbody id="studentBody"></tbody>
             </table>
         </div>
@@ -95,7 +118,7 @@
     <div id="referralList" class="tab-content" style="display:none;">
         <div class="table-container">
             <table>
-                <thead><tr><th>Referrer Name</th><th>Count</th><th>Bonus</th></tr></thead>
+                <thead><tr><th>Referrer Name</th><th>Count</th><th>Total Bonus (৳)</th></tr></thead>
                 <tbody id="referralBody"></tbody>
             </table>
         </div>
@@ -106,7 +129,7 @@
             <div class="grid-form">
                 <input type="text" id="cName" placeholder="Course Name">
                 <input type="number" id="cFee" placeholder="Fee">
-                <button onclick="addCourse()" style="background:var(--accent); color:white; border:none; border-radius:5px;">Add</button>
+                <button onclick="addCourse()" style="background:var(--primary); color:white; border:none; border-radius:5px;">Add Course</button>
             </div>
         </div>
         <table id="courseTable"></table>
@@ -115,13 +138,13 @@
 
 <div id="ledgerModal" class="modal">
     <div class="modal-content">
-        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <span class="close-modal" onclick="closeModal()">×</span>
         <div id="ledgerContent"></div>
     </div>
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwMIQECo_pVi5Cl4YxzdPwQM_sFyTVvPoLqsNzrNwhRkt3GMX4OZQ0ONDPDe1ncXYeK/exec"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyqGDZHf-BZRr71U2VbTNVl3wpXqPTlPO7qn8KeZG_jDovii3UhfecwKnt_si_jT0iH/exec"; 
     let students = [];
     let courses = JSON.parse(localStorage.getItem('LIT_CR_X')) || [{name: "Web Design", fee: 5000}];
 
@@ -130,87 +153,31 @@
             document.getElementById('loginOverlay').style.display = 'none';
             document.getElementById('mainContent').style.display = 'block';
             fetchFromSheet();
-        } else { alert("Wrong Login!"); }
+        } else { alert("Wrong Credentials!"); }
     }
     function logout() { location.reload(); }
 
     async function fetchFromSheet() {
         try {
             const res = await fetch(SCRIPT_URL);
-            const data = await res.json();
-            students = data.map(s => {
-                if(typeof s.history === 'string') {
-                    // শিট থেকে সুন্দর টেক্সট হিস্ট্রিকে অবজেক্টে রূপান্তর
-                    s.rawHistory = s.history; 
-                    s.historyObj = parseHistoryText(s.history);
-                }
-                return s;
-            });
+            students = await res.json();
             refresh();
         } catch (e) { console.log(e); }
-    }
-
-    function parseHistoryText(text) {
-        if(!text) return [];
-        return text.split('\n').map(line => {
-            let amt = line.match(/৳(\d+)/)?.[1] || 0;
-            let date = line.match(/Date: ([^|]+)/)?.[1] || "";
-            let rec = line.match(/Rec: ([^|]+)/)?.[1] || "";
-            return {amt, date, receipt: rec};
-        });
     }
 
     async function postToSheet(data) {
         await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
     }
 
-    function applySearch() {
-        const q = document.getElementById('liveSearch').value.toLowerCase();
-        const filtered = students.filter(s => s.name.toLowerCase().includes(q) || s.mobile.includes(q) || s.id.toString().includes(q));
-        renderList(filtered);
-        if(q !== "") { switchTab(null, 'studentList'); }
-    }
-
-    function switchTab(e, id) {
-        document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).style.display = 'block';
-        if(e) e.currentTarget.classList.add('active');
-        else document.querySelector(`[onclick*="${id}"]`).classList.add('active');
-    }
-
-    function renderCourses() {
-        const sel = document.getElementById('courseSelect');
-        const tbl = document.getElementById('courseTable');
-        sel.innerHTML = '<option value="">-- Course --</option>';
-        tbl.innerHTML = "<tr><th>Course</th><th>Fee</th><th>Action</th></tr>";
-        courses.forEach((c, i) => {
-            sel.innerHTML += `<option value="${c.name}" data-fee="${c.fee}">${c.name}</option>`;
-            tbl.innerHTML += `<tr><td>${c.name}</td><td>${c.fee}</td><td><button onclick="delCourse(${i})">Del</button></td></tr>`;
-        });
-        localStorage.setItem('LIT_CR_X', JSON.stringify(courses));
-    }
-    function addCourse() { courses.push({name: document.getElementById('cName').value, fee: document.getElementById('cFee').value}); renderCourses(); }
-    function delCourse(i) { courses.splice(i,1); renderCourses(); }
-    function autoFee() { 
-        const s = document.getElementById('courseSelect');
-        document.getElementById('totalFee').value = s.options[s.selectedIndex].getAttribute('data-fee') || "";
-    }
-
-    function saveStudent() {
-        const sid = Date.now().toString().slice(-6);
-        const pay = parseInt(document.getElementById('payAmt').value) || 0;
-        const newSt = {
-            id: sid, name: document.getElementById('stdName').value, mobile: document.getElementById('stdMobile').value,
-            course: document.getElementById('courseSelect').value, total: parseInt(document.getElementById('totalFee').value),
-            paid: pay, referrer: document.getElementById('referrer').value || "None",
-            lastBook: document.getElementById('bookNo').value, lastRec: document.getElementById('receiptNo').value,
-            receiver: document.getElementById('reciever').value,
-            history: [{amt: pay, date: new Date().toLocaleString(), receipt: document.getElementById('receiptNo').value, by: document.getElementById('reciever').value}],
-            timestamp: new Date().toLocaleString()
-        };
-        students.push(newSt); postToSheet(newSt); refresh();
-        alert("Saved ID: " + sid);
+    function refresh() {
+        document.getElementById('totalStudents').innerText = students.length;
+        document.getElementById('totalCollection').innerText = "৳ " + students.reduce((a,b)=>a+(parseInt(b.paid)||0),0);
+        document.getElementById('totalDue').innerText = "৳ " + students.reduce((a,b)=>a+(parseInt(b.total-b.paid)||0),0);
+        
+        // Sorting: Last added student first
+        const sortedData = [...students].sort((a, b) => b.id - a.id);
+        renderList(sortedData);
+        renderRefs();
     }
 
     function renderList(data) {
@@ -226,72 +193,127 @@
                 <td>${s.total}</td>
                 <td>${s.paid}</td>
                 <td style="color:${due>0?'red':'green'}">${due}</td>
-                <td>${due>0?`<button onclick="addPay('${s.id}')">Pay</button>`:'Paid'}</td>
+                <td class="action-col">
+                    ${due > 0 ? `<button class="btn-pay" onclick="addPay('${s.id}')">Pay</button>` : `<button class="btn-paid">Paid</button>`}
+                </td>
             </tr>`;
         });
+    }
+
+    function saveStudent() {
+        const sid = Date.now().toString().slice(-6);
+        const pay = parseInt(document.getElementById('payAmt').value) || 0;
+        const newSt = {
+            id: sid, name: document.getElementById('stdName').value, mobile: document.getElementById('stdMobile').value,
+            course: document.getElementById('courseSelect').value, total: parseInt(document.getElementById('totalFee').value),
+            paid: pay, referrer: document.getElementById('referrer').value || "None",
+            lastBook: document.getElementById('bookNo').value, lastRec: document.getElementById('receiptNo').value,
+            receiver: document.getElementById('reciever').value,
+            history: [{amt: pay, date: new Date().toLocaleString(), receipt: document.getElementById('receiptNo').value, by: document.getElementById('reciever').value}],
+            timestamp: new Date().toLocaleString()
+        };
+        students.push(newSt);
+        postToSheet(newSt);
+        refresh();
+        
+        // Clear and switch tab
+        document.querySelectorAll('#admissionForm input').forEach(i => i.value = "");
+        switchTab(null, 'studentList');
     }
 
     function renderRefs() {
         const body = document.getElementById('referralBody');
         body.innerHTML = "";
         let rs = {};
+        let grandTotalRefBonus = 0;
+        
         students.forEach(s => {
-            if(s.referrer !== "None") {
+            if(s.referrer && s.referrer !== "None") {
                 if(!rs[s.referrer]) rs[s.referrer] = [];
                 rs[s.referrer].push(s);
             }
         });
+        
         for(let r in rs) {
             let bonus = rs[r].filter(s => s.paid >= (s.total*0.5)).length * 500;
+            grandTotalRefBonus += bonus;
             body.innerHTML += `<tr>
                 <td><b class="clickable" onclick="showRefDetails('${r}')">${r}</b></td>
                 <td>${rs[r].length}</td>
                 <td>৳ ${bonus}</td>
             </tr>`;
         }
+        document.getElementById('totalReferral').innerText = "৳ " + grandTotalRefBonus;
     }
 
     function showRefDetails(refName) {
         const list = students.filter(s => s.referrer === refName);
         let html = `<h3>Students Referred by: ${refName}</h3><table>
-            <thead><tr><th>Name</th><th>Course</th><th>Paid</th><th>Ledger</th></tr></thead><tbody>`;
+            <thead><tr><th>Name</th><th>Course</th><th>Paid</th><th>Status</th></tr></thead><tbody>`;
         list.forEach(s => {
-            html += `<tr><td>${s.name}</td><td>${s.course}</td><td>${s.paid}</td><td><small>${s.history.replace(/\n/g, '<br>')}</small></td></tr>`;
+            html += `<tr><td>${s.name}</td><td>${s.course}</td><td>${s.paid}</td><td>${s.paid >= (s.total*0.5) ? 'Eligible' : 'Not Eligible'}</td></tr>`;
         });
         document.getElementById('ledgerContent').innerHTML = html + "</tbody></table>";
-        document.getElementById('ledgerModal').style.display = 'block';
-    }
-
-    function openLedger(id) {
-        const s = students.find(x => x.id == id);
-        let hist = typeof s.history === 'string' ? s.history.replace(/\n/g, '<br>') : "No history";
-        document.getElementById('ledgerContent').innerHTML = `<h3>Ledger: ${s.name}</h3><div style="background:#f9f9f9; padding:15px; border-radius:8px;">${hist}</div><br><b>Due: ৳${s.total-s.paid}</b>`;
         document.getElementById('ledgerModal').style.display = 'block';
     }
 
     function addPay(id) {
         const s = students.find(x => x.id == id);
         const amt = prompt(`Due: ${s.total-s.paid}\nEnter Amount:`);
-        if(!amt || parseInt(amt) > (s.total-s.paid)) return;
+        if(!amt || isNaN(amt) || parseInt(amt) > (s.total-s.paid)) return;
         const rec = prompt("Receipt No:");
         const p = parseInt(amt);
         
-        // বর্তমান হিস্ট্রি অবজেক্টে নতুন এন্ট্রি যোগ
-        let historyObj = parseHistoryText(s.history);
-        historyObj.push({amt: p, date: new Date().toLocaleString(), receipt: rec, by: "Admin"});
-        
         s.paid += p; s.lastRec = rec;
-        s.history = historyObj; // আপডেট হিস্ট্রি অবজেক্ট
+        // Logic for history text building
+        let newHistoryLine = `৳${p} (Date: ${new Date().toLocaleDateString()} | Rec: ${rec} | By: Admin)`;
+        s.history = s.history + "\n" + newHistoryLine;
+        
         postToSheet(s); refresh();
     }
 
-    function refresh() {
-        document.getElementById('totalStudents').innerText = students.length;
-        document.getElementById('totalCollection').innerText = "৳ " + students.reduce((a,b)=>a+(parseInt(b.paid)||0),0);
-        document.getElementById('totalDue').innerText = "৳ " + students.reduce((a,b)=>a+(parseInt(b.total-b.paid)||0),0);
-        renderList(students); renderRefs();
+    function openLedger(id) {
+        const s = students.find(x => x.id == id);
+        let hist = s.history.replace(/\n/g, '<br>');
+        document.getElementById('ledgerContent').innerHTML = `<h3>Ledger: ${s.name}</h3><div style="background:#f9f9f9; padding:15px; border-radius:8px; line-height:1.8;">${hist}</div><br><b>Due: ৳${s.total-s.paid}</b>`;
+        document.getElementById('ledgerModal').style.display = 'block';
     }
 
+    function applySearch() {
+        const q = document.getElementById('liveSearch').value.toLowerCase();
+        const filtered = students.filter(s => s.name.toLowerCase().includes(q) || s.mobile.includes(q) || s.id.toString().includes(q));
+        renderList(filtered);
+        if(q !== "") { switchTab(null, 'studentList'); }
+    }
+
+    function switchTab(e, id) {
+        document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).style.display = 'block';
+        if(e) e.currentTarget.classList.add('active');
+        else {
+            const btnId = id === 'studentList' ? 'btn-list' : 'btn-adm';
+            document.getElementById(btnId).classList.add('active');
+        }
+    }
+
+    function renderCourses() {
+        const sel = document.getElementById('courseSelect');
+        const tbl = document.getElementById('courseTable');
+        sel.innerHTML = '<option value="">-- Select Course --</option>';
+        tbl.innerHTML = "<tr><th>Course Name</th><th>Default Fee</th><th>Action</th></tr>";
+        courses.forEach((c, i) => {
+            sel.innerHTML += `<option value="${c.name}" data-fee="${c.fee}">${c.name}</option>`;
+            tbl.innerHTML += `<tr><td>${c.name}</td><td>${c.fee}</td><td><button onclick="delCourse(${i})">Del</button></td></tr>`;
+        });
+        localStorage.setItem('LIT_CR_X', JSON.stringify(courses));
+    }
+    function addCourse() { courses.push({name: document.getElementById('cName').value, fee: document.getElementById('cFee').value}); renderCourses(); }
+    function delCourse(i) { courses.splice(i,1); renderCourses(); }
+    function autoFee() { 
+        const s = document.getElementById('courseSelect');
+        document.getElementById('totalFee').value = s.options[s.selectedIndex].getAttribute('data-fee') || "";
+    }
     function closeModal() { document.getElementById('ledgerModal').style.display = 'none'; }
     renderCourses();
 </script>
